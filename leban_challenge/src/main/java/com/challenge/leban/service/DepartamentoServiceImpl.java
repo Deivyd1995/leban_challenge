@@ -47,7 +47,7 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
         BigDecimal pMin = (precioMin != null && !precioMin.isEmpty()) ? new BigDecimal(precioMin) : null;
         BigDecimal pMax = (precioMax != null && !precioMax.isEmpty()) ? new BigDecimal(precioMax) : null;
 
-        if (pMin.doubleValue() > pMax.doubleValue() ) {
+        if (pMin != null && pMax != null && pMin.compareTo(pMax) > 0) {
             throw new BusinessException("El precio minimo no puede ser mayor que precio maximo");
         }
 
