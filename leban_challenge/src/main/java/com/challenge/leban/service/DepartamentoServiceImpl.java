@@ -3,11 +3,17 @@ package com.challenge.leban.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.challenge.leban.exception.BusinessException;
+import com.challenge.leban.exception.NotFoundException;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.challenge.leban.dto.DepartamentoDto;
 import com.challenge.leban.entity.Departamento;
+import com.challenge.leban.repository.DepartamentoSpecifications;
 import com.challenge.leban.repository.IDepartamentoRepository;
+
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
@@ -21,32 +27,42 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
 
     @Override
     public DepartamentoDto add(DepartamentoDto dto) {
-        log.info("Adding departamento: {}", dto);
         Departamento departamento = new Departamento();
         departamento.setData(dto);
-        log.info(departamento);
         departamentoRepository.save(departamento);
         return departamento.getDTO();
     }
 
     @Override
     public DepartamentoDto update(DepartamentoDto dto, String id) {
-        log.info("Updating departamento: {}", dto);
-        Departamento departamento = departamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Departamento not found"));
+                Departamento departamento = departamentoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Departamento no encontrado"));
         departamento.setData(dto);
         departamentoRepository.save(departamento);
         return departamento.getDTO();
     }
 
     @Override
-    public List<DepartamentoDto> filterDepartamentos(String disponible, String precioMin, String precioMax) {
+    public List<DepartamentoDto> filterDepartamentos(Boolean disponible, String precioMin, String precioMax) {
+        BigDecimal pMin = (precioMin != null && !precioMin.isEmpty()) ? new BigDecimal(precioMin) : null;
+        BigDecimal pMax = (precioMax != null && !precioMax.isEmpty()) ? new BigDecimal(precioMax) : null;
 
-        Boolean disp = (disponible != null && !disponible.isEmpty()) ? Boolean.valueOf(disponible) : null;
-        BigDecimal pMin = (precioMin != null && !precioMin.isEmpty()) ? BigDecimal.valueOf(Double.parseDouble(precioMin))  : null;
-        BigDecimal pMax = (precioMax != null && !precioMax.isEmpty()) ? BigDecimal.valueOf(Double.parseDouble(precioMax)) : null;
+        if (pMin != null && pMax != null && pMin.compareTo(pMax) > 0) {
+            throw new BusinessException("El precio minimo no puede ser mayor que precio maximo");
+        }
 
-        return departamentoRepository.findWithFilters(disp, pMin, pMax)
+        if(pMin != null && pMin.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException("El precio minimo no puede ser menor que 0");
+        }
+        if(pMax != null && pMax.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException("El precio maximo no puede ser menor que 0");
+        }
+
+        Specification<Departamento> spec = DepartamentoSpecifications.hasDisponible(disponible)
+                .and(DepartamentoSpecifications.precioGreaterThanOrEqualTo(pMin))
+                .and(DepartamentoSpecifications.precioLessThanOrEqualTo(pMax));
+
+        return departamentoRepository.findAll(spec)
                 .stream().map(Departamento::getDTO).toList();
     }
 
