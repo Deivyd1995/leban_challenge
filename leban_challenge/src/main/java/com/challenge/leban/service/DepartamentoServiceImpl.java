@@ -24,14 +24,15 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
         log.info("Adding departamento: {}", dto);
         Departamento departamento = new Departamento();
         departamento.setData(dto);
+        log.info(departamento);
         departamentoRepository.save(departamento);
         return departamento.getDTO();
     }
 
     @Override
-    public DepartamentoDto update(DepartamentoDto dto) {
+    public DepartamentoDto update(DepartamentoDto dto, String id) {
         log.info("Updating departamento: {}", dto);
-        Departamento departamento = departamentoRepository.findById(dto.getId())
+        Departamento departamento = departamentoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Departamento not found"));
         departamento.setData(dto);
         departamentoRepository.save(departamento);

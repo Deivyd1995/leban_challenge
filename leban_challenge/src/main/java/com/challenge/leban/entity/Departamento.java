@@ -23,7 +23,7 @@ import lombok.Setter;
 public class Departamento implements IMapper<DepartamentoDto> {
 
     @Id
-    @GeneratedValue(generator = "UUID")
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private String id;
     @Column(name = "titulo", nullable = false, length = 150)
@@ -70,7 +70,6 @@ public class Departamento implements IMapper<DepartamentoDto> {
 
     @Override
     public void setData(DepartamentoDto dto) {
-        this.id = dto.getId();
         this.titulo = dto.getTitulo();
         this.descripcion = dto.getDescripcion();
         this.precio = dto.getPrecio();

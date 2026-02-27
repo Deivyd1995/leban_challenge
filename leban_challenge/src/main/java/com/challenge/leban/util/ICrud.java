@@ -8,6 +8,4 @@ public interface ICrud<T> {
 
     List<T> getAll();
 
-    T update(T t);
-
 }

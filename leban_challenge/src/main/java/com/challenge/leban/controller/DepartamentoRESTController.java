@@ -32,7 +32,8 @@ public class DepartamentoRESTController {
     }
 
     @PostMapping
-    public DepartamentoDto addDepartamento(DepartamentoDto departamentoDto) {
+    public DepartamentoDto addDepartamento(
+            @RequestBody DepartamentoDto departamentoDto) {
         return departamentoService.add(departamentoDto);
     }
 
@@ -40,7 +41,7 @@ public class DepartamentoRESTController {
     public DepartamentoDto updateDepartamento(
             @PathVariable String id,
             @RequestBody DepartamentoDto departamentoDto) {
-        return departamentoService.update(departamentoDto);
+        return departamentoService.update(departamentoDto, id);
     }
 
 }
