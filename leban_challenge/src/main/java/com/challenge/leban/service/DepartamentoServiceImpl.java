@@ -3,6 +3,8 @@ package com.challenge.leban.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.challenge.leban.exception.BusinessException;
+import com.challenge.leban.exception.NotFoundException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -25,19 +27,16 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
 
     @Override
     public DepartamentoDto add(DepartamentoDto dto) {
-        log.info("Adding departamento: {}", dto);
         Departamento departamento = new Departamento();
         departamento.setData(dto);
-        log.info(departamento);
         departamentoRepository.save(departamento);
         return departamento.getDTO();
     }
 
     @Override
     public DepartamentoDto update(DepartamentoDto dto, String id) {
-        log.info("Updating departamento: {}", dto);
-        Departamento departamento = departamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Departamento not found"));
+                Departamento departamento = departamentoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Departamento no encontrado"));
         departamento.setData(dto);
         departamentoRepository.save(departamento);
         return departamento.getDTO();
@@ -47,6 +46,10 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
     public List<DepartamentoDto> filterDepartamentos(Boolean disponible, String precioMin, String precioMax) {
         BigDecimal pMin = (precioMin != null && !precioMin.isEmpty()) ? new BigDecimal(precioMin) : null;
         BigDecimal pMax = (precioMax != null && !precioMax.isEmpty()) ? new BigDecimal(precioMax) : null;
+
+        if (pMin.doubleValue() > pMax.doubleValue() ) {
+            throw new BusinessException("El precio minimo no puede ser mayor que precio maximo");
+        }
 
         Specification<Departamento> spec = DepartamentoSpecifications.hasDisponible(disponible)
                 .and(DepartamentoSpecifications.precioGreaterThanOrEqualTo(pMin))

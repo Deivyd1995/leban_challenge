@@ -45,12 +45,10 @@ public class DepartamentoRESTController {
     public ResponseEntity<DepartamentoDto> updateDepartamento(
             @PathVariable String id,
             @Valid @RequestBody DepartamentoDto departamentoDto) {
-        try {
+
             DepartamentoDto updated = departamentoService.update(departamentoDto, id);
             return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+
     }
 
 }
