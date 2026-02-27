@@ -1,5 +1,6 @@
 package com.challenge.leban.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,7 +32,7 @@ public class Departamento implements IMapper<DepartamentoDto> {
     @Column(name = "descripcion", nullable = false, length = 500)
     private String descripcion;
     @Column(name = "precio", nullable = false)
-    private Float precio;
+    private BigDecimal precio;
     @Enumerated(EnumType.STRING)
     private Moneda moneda;
     @Column(name = "metros_cuadrados")

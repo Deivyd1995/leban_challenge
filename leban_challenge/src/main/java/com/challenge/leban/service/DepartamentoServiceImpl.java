@@ -3,11 +3,15 @@ package com.challenge.leban.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.challenge.leban.dto.DepartamentoDto;
 import com.challenge.leban.entity.Departamento;
+import com.challenge.leban.repository.DepartamentoSpecifications;
 import com.challenge.leban.repository.IDepartamentoRepository;
+
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
@@ -40,13 +44,15 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
     }
 
     @Override
-    public List<DepartamentoDto> filterDepartamentos(String disponible, String precioMin, String precioMax) {
+    public List<DepartamentoDto> filterDepartamentos(Boolean disponible, String precioMin, String precioMax) {
+        BigDecimal pMin = (precioMin != null && !precioMin.isEmpty()) ? new BigDecimal(precioMin) : null;
+        BigDecimal pMax = (precioMax != null && !precioMax.isEmpty()) ? new BigDecimal(precioMax) : null;
 
-        Boolean disp = (disponible != null && !disponible.isEmpty()) ? Boolean.valueOf(disponible) : null;
-        BigDecimal pMin = (precioMin != null && !precioMin.isEmpty()) ? BigDecimal.valueOf(Double.parseDouble(precioMin))  : null;
-        BigDecimal pMax = (precioMax != null && !precioMax.isEmpty()) ? BigDecimal.valueOf(Double.parseDouble(precioMax)) : null;
+        Specification<Departamento> spec = DepartamentoSpecifications.hasDisponible(disponible)
+                .and(DepartamentoSpecifications.precioGreaterThanOrEqualTo(pMin))
+                .and(DepartamentoSpecifications.precioLessThanOrEqualTo(pMax));
 
-        return departamentoRepository.findWithFilters(disp, pMin, pMax)
+        return departamentoRepository.findAll(spec)
                 .stream().map(Departamento::getDTO).toList();
     }
 

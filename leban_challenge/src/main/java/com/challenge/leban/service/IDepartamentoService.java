@@ -7,7 +7,7 @@ import com.challenge.leban.util.ICrud;
 
 public interface IDepartamentoService extends ICrud<DepartamentoDto> {
 
-    List<DepartamentoDto> filterDepartamentos(String disponible, String precioMin, String precioMax);
+    List<DepartamentoDto> filterDepartamentos(Boolean disponible, String precioMin, String precioMax);
 
     DepartamentoDto update(DepartamentoDto dto, String id);
 
