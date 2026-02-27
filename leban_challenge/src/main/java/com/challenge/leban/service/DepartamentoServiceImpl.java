@@ -51,6 +51,13 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
             throw new BusinessException("El precio minimo no puede ser mayor que precio maximo");
         }
 
+        if(pMin != null && pMin.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException("El precio minimo no puede ser menor que 0");
+        }
+        if(pMax != null && pMax.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException("El precio maximo no puede ser menor que 0");
+        }
+
         Specification<Departamento> spec = DepartamentoSpecifications.hasDisponible(disponible)
                 .and(DepartamentoSpecifications.precioGreaterThanOrEqualTo(pMin))
                 .and(DepartamentoSpecifications.precioLessThanOrEqualTo(pMax));
